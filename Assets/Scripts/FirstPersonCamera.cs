@@ -4,27 +4,41 @@ using UnityEngine;
 
 public class FirstPersonCamera : MonoBehaviour 
 {
-    [SerializeField] float sensibility;
-    float mouseX;
-    float mouseY;
-    float xRotation;
-    public Transform playerTransform;
+    [SerializeField] private float movementSpeed;
+    [SerializeField] private float rotationSpeed;
+    [SerializeField] private CharacterController characterController;
+    [SerializeField] private Transform characterTransform;
+    [SerializeField] private Camera characterCamera;
 
-    void Start()
+    private Vector3 movement;
+    private float xRotation;
+
+
+    private void Update()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        PlayerMovement();
+        cameraMovement();
     }
-
-    void Update()
+    void PlayerMovement()
     {
-        mouseX = Input.GetAxis("Mouse X") * sensibility * Time.deltaTime;
-        mouseY = Input.GetAxis("Mouse X") * sensibility * Time.deltaTime;
+        float movX = Input.GetAxis("Horizontal");
+        float movZ = Input.GetAxis("Vertical");
 
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, -90f); 
+        movement = transform.right * movX + transform.up * movZ;
+        characterController.SimpleMove(movement*movementSpeed);
+    }
+    
+    void cameraMovement()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * rotationSpeed;
+        float mouseY = Input.GetAxis("Mouse Y") * rotationSpeed;
 
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        playerTransform.Rotate(Vector3.up * mouseX);
+        xRotation -= mouseX;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+        characterCamera.transform.localRotation = Quaternion.Euler(mouseX, 0, 0);
+        characterTransform.Rotate(Vector3.up * mouseX);
+
 
     }
 }
